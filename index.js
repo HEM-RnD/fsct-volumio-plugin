@@ -26,7 +26,7 @@ const { FsctIpcClient } = require('@hemspzoo/fsct-client');
 
 module.exports = FerrumStreamingControlTechnology;
 
-const PLAYER_SELF_ID = 'com.ferrum.volumio-fsct-plugin';
+const PLAYER_SELF_ID = 'com.hem-e.fsct-volumio-plugin';
 const RECONNECT_DELAY_MS = 2000;
 
 // Module-level singletons — Volumio loads only one instance of a plugin.
