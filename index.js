@@ -94,23 +94,6 @@ function buildPlayerState(state) {
     };
 }
 
-async function assignToAllDevices() {
-    if (!ipcClient || playerId === null) return;
-    try {
-        const devices = await ipcClient.getDetectedDevices();
-        for (const deviceId of devices) {
-            try {
-                await ipcClient.assignPlayerToDevice(playerId, deviceId);
-                logInfo('assigned player to device ' + deviceId);
-            } catch (e) {
-                logError('assign to ' + deviceId + ' failed: ' + (e && e.message));
-            }
-        }
-    } catch (e) {
-        logError('getDetectedDevices failed: ' + (e && e.message));
-    }
-}
-
 async function pushLastState() {
     if (!ipcClient || playerId === null) return;
     try {
@@ -141,22 +124,14 @@ async function connectAndRegister() {
         playerId = null;
         scheduleReconnect();
     });
-    client.on('deviceChanged', function (e) {
-        if (e.event === 'added' && ipcClient && playerId !== null) {
-            ipcClient.assignPlayerToDevice(playerId, e.deviceId).then(function () {
-                logInfo('assigned player to newly added device ' + e.deviceId);
-            }).catch(function (err) {
-                logError('assign on add failed: ' + (err && err.message));
-            });
-        }
-    });
+    // Intentionally not subscribing to 'deviceChanged' / not calling assignPlayerToDevice:
+    // when the player is unassigned, the driver's fallback broadcasts state to every device.
 
     const id = await client.registerPlayer(PLAYER_SELF_ID);
     ipcClient = client;
     playerId = id;
     logInfo('registered player id=' + id + ', protocol=' + client.negotiatedVersion.major + '.' + client.negotiatedVersion.minor);
 
-    await assignToAllDevices();
     await pushLastState();
 }
 

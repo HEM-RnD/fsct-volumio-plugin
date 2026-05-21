@@ -22,8 +22,8 @@ Volumio's plugin manager instantiates `FerrumStreamingControlTechnology` (export
 2. `onStart` — seeds `lastState` from `commandRouter.volumioGetState()`, then `connectAndRegister()`:
    - `FsctIpcClient.connect()` → connects to the driver IPC endpoint.
    - `registerPlayer(PLAYER_SELF_ID)` → driver returns a `playerId`.
-   - `getDetectedDevices()` then `assignPlayerToDevice` for each — also re-assigns on every `'deviceChanged'` (`event: 'added'`) event so hot-plugged DACs pick up state immediately.
-   - Pushes the seeded `lastState` so the DAC reflects current state before the first Volumio `pushState`.
+   - **The player is intentionally left unassigned to any device** — the driver's fallback broadcasts state from the (single) unassigned player to every detected DAC. This is simpler than picking a device and covers the common single-player setup. If you ever need targeted routing, call `assignPlayerToDevice` here and subscribe to `'deviceChanged'`.
+   - Pushes the seeded `lastState` so any connected DAC reflects current state before the first Volumio `pushState`.
 3. `pushState(state)` — Volumio's per-state-change callback; the only hot path. Builds a `PlayerState` and calls `updatePlayerState(playerId, …)`.
 4. `onStop` — `unregisterPlayer` + `disconnect`. Sets a `stopping` flag to suppress the reconnect timer.
 
