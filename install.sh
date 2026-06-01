@@ -2,7 +2,7 @@
 set -e
 
 # Keep this version in sync with the @hemspzoo/fsct-client version in package.json.
-FSCT_DRIVER_VERSION="0.2.14-alpha.277"
+FSCT_DRIVER_VERSION="0.2.14-alpha.290"
 
 DPKG_ARCH=$(dpkg --print-architecture)
 DEB_FILE="fsct-driver_${FSCT_DRIVER_VERSION}_${DPKG_ARCH}.deb"

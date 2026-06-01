@@ -33,7 +33,7 @@ The `'close'` event on the IPC client triggers a 2 s reconnect timer (`scheduleR
 
 Volumio state object → FSCT `PlayerState`:
 - `state.status` (`"play"`/`"pause"`/`"stop"`/other) → `'playing'`/`'paused'`/`'stopped'`/`'unknown'` (lowercase wire-format strings, not an enum).
-- Timeline: `positionMs = state.seek` (Volumio already uses ms), `durationMs = Math.round(state.duration * 1000)` (Volumio uses **seconds** for duration — must be converted), `updateUnixMs = Date.now()`, `rate = 1.0` when playing else `0.0`. Returns `null` if `seek` or `duration` is missing, signalling "no timeline" to the driver.
+- Timeline: `positionMs = state.seek` (Volumio already uses ms), `durationMs = Math.round(state.duration * 1000)` (Volumio uses **seconds** for duration — must be converted), `rate = 1.0` when playing else `0.0`. The optional anchor field is `updateMonoMs` — a `process.hrtime` **monotonic** ms stamp (was `updateUnixMs`/wall-clock before client `41a782e`), which the client bridges to the driver's frame via a connect-time time-sync handshake. We **omit** it so the client anchors at "now" (age 0); correct because Volumio carries no sample timestamp and `state.seek` is current at `pushState` time. Returns `null` if `seek` or `duration` is missing, signalling "no timeline" to the driver.
 - Texts: `{ title, artist, album, genre }` — Volumio supplies the first three, `genre` is always `null`.
 
 When changing the mapping, double-check the unit asymmetry between `state.seek` (ms) and `state.duration` (s) — easy to break.

@@ -73,9 +73,10 @@ function buildTimeline(state) {
     // Volumio: state.seek is ms, state.duration is seconds.
     if (state.seek === undefined || state.duration === undefined) return null;
     const playing = state.status === 'play';
+    // updateMonoMs intentionally omitted: Volumio carries no sample timestamp of its own,
+    // so the client anchors the position at "now" (age 0), which is when pushState fired.
     return {
         positionMs: state.seek,
-        updateUnixMs: Date.now(),
         durationMs: Math.round(state.duration * 1000),
         rate: playing ? 1.0 : 0.0,
     };
